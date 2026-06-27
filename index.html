@@ -101,7 +101,7 @@
 <body>
 
 <div class="topnav">
-  <div class="brand" onclick="goPublic()">LUMI&Egrave;RE <span>JEWELS</span></div>
+  <div class="brand" onclick="goPublic()">YAZHNILA'S BRIDAL <span>JEWELS</span></div>
   <div class="navlinks">
     <a onclick="goPublic()" id="navPublic">Collection</a>
     <a onclick="goAdmin()" id="navAdmin">Admin</a>
@@ -185,7 +185,7 @@
       </div>
       <div>
         <label>Rental Price (per event)</label>
-        <input id="f_price" placeholder="e.g. $150">
+        <input id="f_price" placeholder="e.g. INR150">
       </div>
       <div>
         <label>Status</label>
@@ -230,12 +230,12 @@ let editingId = null;
 const placeholderImg = (seed) => `https://picsum.photos/seed/${seed}/500/500`;
 
 const seedData = () => ([
-  {id:"1",name:"Cascade Diamond Necklace",category:"Necklace",price:"$180",status:"available",img:placeholderImg("neck1"),desc:"A flowing cascade of diamonds set in white gold, perfect for black-tie events."},
-  {id:"2",name:"Aurora Drop Earrings",category:"Earrings",price:"$90",status:"available",img:placeholderImg("ear1"),desc:"Elegant teardrop earrings with sapphire accents."},
-  {id:"3",name:"Vintage Pearl Ring",category:"Ring",price:"$60",status:"rented",img:placeholderImg("ring1"),desc:"A timeless pearl and gold ring inspired by 1920s design."},
-  {id:"4",name:"Golden Vine Bracelet",category:"Bracelet",price:"$75",status:"available",img:placeholderImg("brac1"),desc:"Delicate gold vine pattern bracelet with subtle emerald leaves."},
-  {id:"5",name:"Starlight Tiara",category:"Tiara / Headpiece",price:"$220",status:"available",img:placeholderImg("tiara1"),desc:"A regal tiara encrusted with cubic zirconia, ideal for weddings."},
-  {id:"6",name:"Art Deco Brooch",category:"Brooch",price:"$55",status:"rented",img:placeholderImg("brooch1"),desc:"Geometric Art Deco brooch in silver and onyx."},
+  {id:"1",name:"Cascade Diamond Necklace",category:"Necklace",price:"INR180",status:"available",img:placeholderImg("neck1"),desc:"A flowing cascade of diamonds set in white gold, perfect for black-tie events."},
+  {id:"2",name:"Aurora Drop Earrings",category:"Earrings",price:"INR90",status:"available",img:placeholderImg("ear1"),desc:"Elegant teardrop earrings with sapphire accents."},
+  {id:"3",name:"Vintage Pearl Ring",category:"Ring",price:"INR60",status:"rented",img:placeholderImg("ring1"),desc:"A timeless pearl and gold ring inspired by 1920s design."},
+  {id:"4",name:"Golden Vine Bracelet",category:"Bracelet",price:"INR75",status:"available",img:placeholderImg("brac1"),desc:"Delicate gold vine pattern bracelet with subtle emerald leaves."},
+  {id:"5",name:"Starlight Tiara",category:"Tiara / Headpiece",price:"INR220",status:"available",img:placeholderImg("tiara1"),desc:"A regal tiara encrusted with cubic zirconia, ideal for weddings."},
+  {id:"6",name:"Art Deco Brooch",category:"Brooch",price:"INR55",status:"rented",img:placeholderImg("brooch1"),desc:"Geometric Art Deco brooch in silver and onyx."},
 ]);
 
 async function loadCatalog(){
@@ -282,7 +282,7 @@ function renderGrid(){
       <div class="info">
         <div class="cat">${escHtml(p.category)}</div>
         <h3>${escHtml(p.name)}</h3>
-        <div class="price">${escHtml(p.price)} / event</div>
+        <div class="price">INR{escHtml(p.price)} / event</div>
       </div>
     </div>
   `).join('');
