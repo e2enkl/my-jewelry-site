@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lumière Jewels — Rental Collection</title>
+<style>
+  :root{
+    --bg:#0e0d0c; --bg2:#171513; --gold:#d4af6a; --gold-light:#f0d8a8;
+    --cream:#f5efe3; --muted:#9a9388; --line:#2a2722;
+    --available:#7fae8a; --rented:#c47b6a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--cream);font-family:Georgia,'Times New Roman',serif;}
+  h1,h2,h3{font-family:'Playfair Display',Georgia,serif;letter-spacing:.5px;}
+  .topnav{display:flex;justify-content:space-between;align-items:center;padding:18px 36px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(14,13,12,.92);backdrop-filter:blur(6px);z-index:50;}
+  .brand{font-size:22px;color:var(--gold-light);letter-spacing:2px;cursor:pointer;}
+  .brand span{color:var(--gold);}
+  .navlinks{display:flex;gap:24px;align-items:center;font-size:14px;}
+  .navlinks a{color:var(--muted);text-decoration:none;cursor:pointer;transition:.2s;}
+  .navlinks a:hover{color:var(--gold-light);}
+
+  .hero{padding:90px 36px 60px;text-align:center;background:
+    radial-gradient(ellipse at 50% -10%, rgba(212,175,106,.15), transparent 60%);}
+  .hero h1{font-size:48px;color:var(--cream);margin:0 0 10px;}
+  .hero h1 em{color:var(--gold);font-style:normal;}
+  .hero p{color:var(--muted);font-size:16px;max-width:560px;margin:0 auto;}
+
+  .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:0 20px 40px;}
+  .filters button{background:transparent;border:1px solid var(--line);color:var(--muted);padding:9px 20px;border-radius:30px;cursor:pointer;font-size:13px;letter-spacing:.5px;transition:.25s;}
+  .filters button:hover{border-color:var(--gold);color:var(--gold-light);}
+  .filters button.active{background:var(--gold);color:#1a1712;border-color:var(--gold);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:28px;padding:0 36px 80px;max-width:1300px;margin:0 auto;}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:pointer;transition:.35s ease;}
+  .card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 16px 40px rgba(0,0,0,.5);}
+  .card .imgwrap{position:relative;height:240px;overflow:hidden;background:#1c1916;}
+  .card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
+  .card:hover img{transform:scale(1.08);}
+  .badge{position:absolute;top:12px;right:12px;font-size:11px;padding:5px 12px;border-radius:20px;letter-spacing:.5px;font-family:Arial,sans-serif;}
+  .badge.available{background:rgba(127,174,138,.18);color:var(--available);border:1px solid var(--available);}
+  .badge.rented{background:rgba(196,123,106,.18);color:var(--rented);border:1px solid var(--rented);}
+  .card .info{padding:18px;}
+  .card .cat{font-size:11px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;font-family:Arial,sans-serif;}
+  .card h3{font-size:19px;margin:6px 0 8px;color:var(--cream);}
+  .card .price{color:var(--muted);font-size:14px;font-family:Arial,sans-serif;}
+
+  .empty{text-align:center;color:var(--muted);padding:80px 20px;grid-column:1/-1;}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--line);border-radius:8px;max-width:780px;width:100%;max-height:88vh;overflow:auto;display:grid;grid-template-columns:1fr 1fr;}
+  @media(max-width:680px){.modal{grid-template-columns:1fr;}}
+  .modal .mimg{height:100%;min-height:280px;background:#1c1916;}
+  .modal .mimg img{width:100%;height:100%;object-fit:cover;display:block;}
+  .modal .mbody{padding:32px;position:relative;}
+  .modal .close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;}
+  .modal .cat{font-size:12px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;font-family:Arial,sans-serif;}
+  .modal h2{margin:8px 0 14px;font-size:28px;}
+  .modal .desc{color:#c9c2b4;line-height:1.6;font-size:15px;margin-bottom:18px;}
+  .modal .price{font-size:20px;color:var(--gold-light);font-family:Arial,sans-serif;margin-bottom:16px;}
+
+  footer{border-top:1px solid var(--line);padding:50px 36px;text-align:center;color:var(--muted);font-family:Arial,sans-serif;font-size:14px;}
+  footer .contact{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-top:16px;font-size:15px;}
+  footer a{color:var(--gold-light);text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+
+  /* Admin */
+  .admin{display:none;padding:40px 36px;max-width:1100px;margin:0 auto;}
+  .admin.show{display:block;}
+  .public.hide{display:none;}
+  .login-box{max-width:360px;margin:80px auto;text-align:center;background:var(--bg2);border:1px solid var(--line);padding:40px;border-radius:8px;}
+  .login-box input{width:100%;padding:12px;margin:14px 0;background:#0e0d0c;border:1px solid var(--line);color:var(--cream);border-radius:4px;font-family:Arial,sans-serif;}
+  .btn{background:var(--gold);color:#1a1712;border:none;padding:11px 22px;border-radius:4px;cursor:pointer;font-size:14px;letter-spacing:.5px;font-family:Arial,sans-serif;font-weight:bold;}
+  .btn:hover{background:var(--gold-light);}
+  .btn.secondary{background:transparent;border:1px solid var(--line);color:var(--muted);}
+  .btn.secondary:hover{border-color:var(--gold);color:var(--gold-light);}
+  .btn.danger{background:transparent;border:1px solid var(--rented);color:var(--rented);}
+  .err{color:var(--rented);font-size:13px;font-family:Arial,sans-serif;}
+
+  .admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:14px;}
+  .admin-table{width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;}
+  .admin-table th{text-align:left;color:var(--gold);font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:10px;border-bottom:1px solid var(--line);}
+  .admin-table td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  .admin-table img{width:50px;height:50px;object-fit:cover;border-radius:4px;}
+  select.statusSel{background:#0e0d0c;color:var(--cream);border:1px solid var(--line);border-radius:4px;padding:5px 8px;font-family:Arial,sans-serif;}
+  .row-actions{display:flex;gap:8px;}
+  .row-actions button{font-size:12px;padding:6px 10px;}
+
+  .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;background:var(--bg2);border:1px solid var(--line);padding:24px;border-radius:8px;margin-bottom:30px;font-family:Arial,sans-serif;}
+  .formgrid.hide{display:none;}
+  .formgrid label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
+  .formgrid input,.formgrid select,.formgrid textarea{width:100%;padding:9px;background:#0e0d0c;border:1px solid var(--line);color:var(--cream);border-radius:4px;font-family:Arial,sans-serif;font-size:13px;}
+  .formgrid .full{grid-column:1/-1;}
+  .formgrid textarea{resize:vertical;min-height:60px;}
+  .formactions{grid-column:1/-1;display:flex;gap:10px;justify-content:flex-end;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--gold);color:#1a1712;padding:12px 20px;border-radius:6px;font-family:Arial,sans-serif;font-size:14px;display:none;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .loadmsg{text-align:center;color:var(--muted);padding:60px;font-family:Arial,sans-serif;}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="brand" onclick="goPublic()">LUMI&Egrave;RE <span>JEWELS</span></div>
+  <div class="navlinks">
+    <a onclick="goPublic()" id="navPublic">Collection</a>
+    <a onclick="goAdmin()" id="navAdmin">Admin</a>
+  </div>
+</div>
+
+<!-- PUBLIC SITE -->
+<div id="publicView" class="public">
+  <div class="hero">
+    <h1>Rent Timeless <em>Elegance</em></h1>
+    <p>A curated collection of fine jewelry, available to rent for your most memorable occasions.</p>
+  </div>
+
+  <div class="filters" id="filterBar"></div>
+
+  <div id="loadingMsg" class="loadmsg">Loading collection…</div>
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <div>Lumière Jewels — Fine Jewelry Rentals</div>
+    <div class="contact">
+      <a href="tel:+10000000000">📞 +1 (000) 000-0000</a>
+      <a href="mailto:hello@lumierejewels.com">✉️ hello@lumierejewels.com</a>
+      <a href="https://instagram.com" target="_blank">📷 Instagram</a>
+      <a href="https://wa.me/10000000000" target="_blank">💬 WhatsApp</a>
+    </div>
+  </footer>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="mimg"><img id="modalImg" src="" alt=""></div>
+    <div class="mbody">
+      <button class="close" onclick="closeModal()">&times;</button>
+      <div class="cat" id="modalCat"></div>
+      <h2 id="modalName"></h2>
+      <div class="price" id="modalPrice"></div>
+      <div id="modalBadge"></div>
+      <div class="desc" id="modalDesc" style="margin-top:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminView" class="admin">
+
+  <div id="loginScreen" class="login-box">
+    <h2 style="color:var(--gold-light);">Admin Access</h2>
+    <p style="color:var(--muted);font-family:Arial,sans-serif;font-size:13px;">Enter password to manage your catalog.</p>
+    <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')tryLogin()">
+    <div class="err" id="loginErr"></div>
+    <button class="btn" style="width:100%;margin-top:8px;" onclick="tryLogin()">Enter</button>
+    <p style="color:var(--muted);font-size:11px;margin-top:14px;font-family:Arial,sans-serif;">Default password: admin123 (change it in the code)</p>
+  </div>
+
+  <div id="adminPanel" style="display:none;">
+    <div class="admin-head">
+      <h2 style="color:var(--gold-light);margin:0;">Manage Catalog</h2>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" onclick="openForm()">+ Add Piece</button>
+        <button class="btn secondary" onclick="adminLogout()">Log Out</button>
+      </div>
+    </div>
+
+    <div class="formgrid hide" id="pieceForm">
+      <div>
+        <label>Name</label>
+        <input id="f_name" placeholder="e.g. Cascade Diamond Necklace">
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="f_cat">
+          <option>Necklace</option>
+          <option>Earrings</option>
+          <option>Ring</option>
+          <option>Bracelet</option>
+          <option>Tiara / Headpiece</option>
+          <option>Brooch</option>
+        </select>
+      </div>
+      <div>
+        <label>Rental Price (per event)</label>
+        <input id="f_price" placeholder="e.g. $150">
+      </div>
+      <div>
+        <label>Status</label>
+        <select id="f_status">
+          <option value="available">Available</option>
+          <option value="rented">Currently Rented</option>
+        </select>
+      </div>
+      <div class="full">
+        <label>Image URL</label>
+        <input id="f_img" placeholder="https://...">
+      </div>
+      <div class="full">
+        <label>Description</label>
+        <textarea id="f_desc" placeholder="Short description of the piece, materials, stones, etc."></textarea>
+      </div>
+      <div class="formactions">
+        <button class="btn secondary" onclick="closeForm()">Cancel</button>
+        <button class="btn" onclick="savePiece()">Save Piece</button>
+      </div>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="adminTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PASSWORD = "admin123";
+const STORAGE_KEY = "jewelry-catalog";
+
+let catalog = [];
+let activeFilter = "All";
+let editingId = null;
+
+const placeholderImg = (seed) => `https://picsum.photos/seed/${seed}/500/500`;
+
+const seedData = () => ([
+  {id:"1",name:"Cascade Diamond Necklace",category:"Necklace",price:"$180",status:"available",img:placeholderImg("neck1"),desc:"A flowing cascade of diamonds set in white gold, perfect for black-tie events."},
+  {id:"2",name:"Aurora Drop Earrings",category:"Earrings",price:"$90",status:"available",img:placeholderImg("ear1"),desc:"Elegant teardrop earrings with sapphire accents."},
+  {id:"3",name:"Vintage Pearl Ring",category:"Ring",price:"$60",status:"rented",img:placeholderImg("ring1"),desc:"A timeless pearl and gold ring inspired by 1920s design."},
+  {id:"4",name:"Golden Vine Bracelet",category:"Bracelet",price:"$75",status:"available",img:placeholderImg("brac1"),desc:"Delicate gold vine pattern bracelet with subtle emerald leaves."},
+  {id:"5",name:"Starlight Tiara",category:"Tiara / Headpiece",price:"$220",status:"available",img:placeholderImg("tiara1"),desc:"A regal tiara encrusted with cubic zirconia, ideal for weddings."},
+  {id:"6",name:"Art Deco Brooch",category:"Brooch",price:"$55",status:"rented",img:placeholderImg("brooch1"),desc:"Geometric Art Deco brooch in silver and onyx."},
+]);
+
+async function loadCatalog(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    catalog = raw ? JSON.parse(raw) : seedData();
+    if(!raw){ localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog)); }
+  }catch(e){
+    catalog = seedData();
+  }
+  document.getElementById('loadingMsg').style.display = 'none';
+  renderFilters();
+  renderGrid();
+  if(document.getElementById('adminPanel').style.display !== 'none'){ renderAdminTable(); }
+}
+
+async function persist(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+  }catch(e){ showToast("Save failed — try again"); }
+}
+
+function renderFilters(){
+  const cats = ["All", ...Array.from(new Set(catalog.map(p=>p.category)))];
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = cats.map(c=>`<button class="${c===activeFilter?'active':''}" onclick="setFilter('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('');
+}
+
+function setFilter(c){ activeFilter = c; renderFilters(); renderGrid(); }
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  const items = activeFilter==="All" ? catalog : catalog.filter(p=>p.category===activeFilter);
+  if(items.length===0){
+    grid.innerHTML = `<div class="empty">No pieces in this category yet.</div>`;
+    return;
+  }
+  grid.innerHTML = items.map(p=>`
+    <div class="card" onclick="openModal('${p.id}')">
+      <div class="imgwrap">
+        <img src="${escAttr(p.img)}" alt="${escAttr(p.name)}" onerror="this.src='${placeholderImg(p.id)}'">
+        <span class="badge ${p.status}">${p.status==='available'?'Available':'Rented'}</span>
+      </div>
+      <div class="info">
+        <div class="cat">${escHtml(p.category)}</div>
+        <h3>${escHtml(p.name)}</h3>
+        <div class="price">${escHtml(p.price)} / event</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id){
+  const p = catalog.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('modalImg').src = p.img;
+  document.getElementById('modalImg').onerror = function(){ this.src = placeholderImg(p.id); };
+  document.getElementById('modalCat').textContent = p.category;
+  document.getElementById('modalName').textContent = p.name;
+  document.getElementById('modalPrice').textContent = p.price + ' / event';
+  document.getElementById('modalBadge').innerHTML = `<span class="badge ${p.status}" style="position:static;display:inline-block;">${p.status==='available'?'Available':'Currently Rented'}</span>`;
+  document.getElementById('modalDesc').textContent = p.desc || '';
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+
+function escHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escAttr(s){ return escHtml(s); }
+
+function goPublic(){
+  document.getElementById('publicView').classList.remove('hide');
+  document.getElementById('adminView').classList.remove('show');
+}
+function goAdmin(){
+  document.getElementById('publicView').classList.add('hide');
+  document.getElementById('adminView').classList.add('show');
+}
+
+function tryLogin(){
+  const val = document.getElementById('pwInput').value;
+  if(val === ADMIN_PASSWORD){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    renderAdminTable();
+  }else{
+    document.getElementById('loginErr').textContent = 'Incorrect password.';
+  }
+}
+function adminLogout(){
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('pwInput').value = '';
+  document.getElementById('loginErr').textContent = '';
+}
+
+function renderAdminTable(){
+  const tbody = document.getElementById('adminTbody');
+  if(catalog.length===0){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No pieces yet. Click "+ Add Piece" to start.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = catalog.map(p=>`
+    <tr>
+      <td><img src="${escAttr(p.img)}" onerror="this.src='${placeholderImg(p.id)}'"></td>
+      <td>${escHtml(p.name)}</td>
+      <td>${escHtml(p.category)}</td>
+      <td>${escHtml(p.price)}</td>
+      <td>
+        <select class="statusSel" onchange="changeStatus('${p.id}', this.value)">
+          <option value="available" ${p.status==='available'?'selected':''}>Available</option>
+          <option value="rented" ${p.status==='rented'?'selected':''}>Rented</option>
+        </select>
+      </td>
+      <td class="row-actions">
+        <button class="btn secondary" onclick="editPiece('${p.id}')">Edit</button>
+        <button class="btn danger" onclick="deletePiece('${p.id}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function changeStatus(id, status){
+  const p = catalog.find(x=>x.id===id);
+  if(p){ p.status = status; await persist(); renderGrid(); showToast('Status updated'); }
+}
+
+function openForm(){
+  editingId = null;
+  document.getElementById('f_name').value='';
+  document.getElementById('f_cat').value='Necklace';
+  document.getElementById('f_price').value='';
+  document.getElementById('f_status').value='available';
+  document.getElementById('f_img').value='';
+  document.getElementById('f_desc').value='';
+  document.getElementById('pieceForm').classList.remove('hide');
+}
+function closeForm(){ document.getElementById('pieceForm').classList.add('hide'); editingId=null; }
+
+function editPiece(id){
+  const p = catalog.find(x=>x.id===id);
+  if(!p) return;
+  editingId = id;
+  document.getElementById('f_name').value = p.name;
+  document.getElementById('f_cat').value = p.category;
+  document.getElementById('f_price').value = p.price;
+  document.getElementById('f_status').value = p.status;
+  document.getElementById('f_img').value = p.img;
+  document.getElementById('f_desc').value = p.desc || '';
+  document.getElementById('pieceForm').classList.remove('hide');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function savePiece(){
+  const name = document.getElementById('f_name').value.trim();
+  if(!name){ showToast('Please enter a name'); return; }
+  const data = {
+    name,
+    category: document.getElementById('f_cat').value,
+    price: document.getElementById('f_price').value.trim() || '$0',
+    status: document.getElementById('f_status').value,
+    img: document.getElementById('f_img').value.trim(),
+    desc: document.getElementById('f_desc').value.trim(),
+  };
+  if(editingId){
+    const p = catalog.find(x=>x.id===editingId);
+    Object.assign(p, data);
+  }else{
+    data.id = 'p_' + Date.now();
+    if(!data.img) data.img = placeholderImg(data.id);
+    catalog.push(data);
+  }
+  await persist();
+  closeForm();
+  renderFilters();
+  renderGrid();
+  renderAdminTable();
+  showToast('Saved successfully');
+}
+
+async function deletePiece(id){
+  if(!confirm('Delete this piece? This cannot be undone.')) return;
+  catalog = catalog.filter(p=>p.id!==id);
+  await persist();
+  renderFilters();
+  renderGrid();
+  renderAdminTable();
+  showToast('Piece deleted');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.style.display='none'; }, 2200);
+}
+
+loadCatalog();
+</script>
+</body>
+</html>
